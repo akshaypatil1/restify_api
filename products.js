@@ -1,3 +1,5 @@
+let response = require('./src/response');
+
 function ProductController(){
     let self = this;
     self.store = [];
@@ -12,57 +14,51 @@ function ProductController(){
     };
 
     self.get = function(req,res,next){
-        res.send(200,self.store);
-        return next();
+       response.sendResult(res,200,self.store,next);
     };
 
     self.getById = function(req,res,next){
         let found = findProductById(req);
         if(found){
-            res.send(200, found);
+            response.sendResult(res,200,found,next);
         }else{
-            res.send(404, "product not found")
+            response.sendError(res,404,"Product not found",next);
         }
-        return next();
     };
 
     self.post = function(req,res,next){
         if(!req.body.hasOwnProperty('name')){
-            res.send(500);
+            response.sendError(res,500,'Field missing',next);
         }else{
             let index = self.store.length + 1;
-            self.store.push({
+            dataObject = {
                 id : parseInt(index),
                 name : req.body.name
-            });
-            res.send(201,{
-                id : parseInt(index),
-                name : req.body.name
-            });
+            };
+            self.store.push(dataObject);
+            response.sendResult(res,201,dataObject,next);
         }
-        return next();
     };
 
     self.put = function(req,res,next){
         if(!req.body.hasOwnProperty('name')){
-            res.send(500);
-        }
-        let found = findProductById(req);
-        if(found){
-            found.name = req.body.name;
-            res.send(200, found);
+            response.sendError(res,500,'Field missing',next);
         }else{
-            res.send(404, "Product not found");
+            let found = findProductById(req);
+            if(found){
+                found.name = req.body.name;
+                response.sendResult(res,200,found,next);
+            }else{
+                response.sendError(res,404,"Product not found",next);
+            }
         }
-        return next();
     };
 
     self.del = function(req, res, next){
         self.store = self.store.filter(function(p){
             return p.id !== parseInt(req.params.id)
         });
-        res.send(200,{});
-        return next();
+        response.sendResult(res,200,{},next);
     }
 };
 

@@ -1,6 +1,7 @@
 'use strict';
 const restify = require('restify');
-const products = require('./products')
+const products = require('./products');
+const files = require('./files');
 const DEFAULT_PORT = 8080;
 const server = restify.createServer({
 	name: 'server',
@@ -26,7 +27,7 @@ const server = restify.createServer({
 });
 
 server.use(function(req,res,next){
-	console.log(req.method);
+	console.log('>>>>>',req.method);
 	res.header("Access-Control-Allow-Origin", "*");
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 	return next();
@@ -43,7 +44,6 @@ function corsHandler(req, res, next) {
 	return next();
 }
 function optionsRoute(req, res, next) {
-	
 	res.send(200);
 	return next();
 }
@@ -56,6 +56,10 @@ server.get('api/products/:id',products.getById);
 server.post('api/products',products.post);
 server.put('api/products/:id',products.put);
 server.del('api/products/:id',products.del);
+
+server.get('api/file/:name',files.get);
+server.post('api/file',files.post);
+server.del('api/file/:name',files.del);
 
 server.listen(DEFAULT_PORT, function(){
 	console.log('SERVER STATED AT '+DEFAULT_PORT);
